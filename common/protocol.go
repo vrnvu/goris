@@ -60,22 +60,21 @@ func AppendToBuffer(msg string, buffer *bytes.Buffer) (*bytes.Buffer, error) {
 	}
 
 	if buffer == nil {
-		buffer = bytes.NewBuffer(make([]byte, 0))
+		buffer = bytes.NewBuffer(make([]byte, 0, PROTOCOL_HEADER+len((msg))))
 	}
 
 	header := make([]byte, PROTOCOL_HEADER)
-	var headerv = uint32(len(msg))
-	binary.LittleEndian.PutUint32(header, headerv)
+	binary.LittleEndian.PutUint32(header, uint32(len(msg)))
 
 	_, err := buffer.Write(header)
 	if err != nil {
 		return nil, err
 	}
-	_, err = buffer.Write([]byte(msg))
+
+	_, err = buffer.WriteString(msg)
 	if err != nil {
 		return nil, err
 	}
 
 	return buffer, nil
-
 }
